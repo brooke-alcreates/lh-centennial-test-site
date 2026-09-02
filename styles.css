@@ -330,7 +330,7 @@ a{ color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 32px;
-  max-width: 900px;
+  max-width: 1080px;
   margin: 0 auto;
   padding-bottom: 40px;
 }
@@ -346,16 +346,8 @@ a{ color: inherit; text-decoration: none; }
   margin: 2px 0 14px;
 }
 .project-col .thumb{
-  background: var(--grey-block);
-  border-radius: 2px;
-  aspect-ratio: 4 / 3;
-  box-shadow: var(--shadow-photo);
-  position: relative; /* anchors .thumb-tip, where present */
-}
-.project-col .thumb.thumb-photo{
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  aspect-ratio: 5 / 4;
+  position: relative;
 }
 .project-col .btn{
   margin-top: 18px;
@@ -363,49 +355,80 @@ a{ color: inherit; text-decoration: none; }
   padding: 10px 22px;
 }
 
-/* Hover/focus detail card for a project thumb (currently just the
-   Community Memory Lab photo) — rises above the placeholder rather than
-   covering it, so the caption/figure above stay visible while reading it. */
-.thumb-tip{
+/* Flip cards for the three project thumbs — tap/click or hover/focus
+   (keyboard) flips the card over to reveal the detail copy on its back,
+   in place of the old hover-triggered tooltip. */
+.thumb-flip{ perspective: 1400px; cursor: pointer; }
+.thumb-flip-inner{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+/* .is-flipped (toggled in script.js) covers a tap or a keyboard
+   Enter/Space. :hover is scoped to (hover:hover) and (pointer:fine) — a
+   real mouse — rather than left unscoped: touchscreen browsers routinely
+   apply :hover to whatever was just tapped and leave it "stuck" there
+   until something else is tapped, which would make a second tap look
+   like it does nothing. :focus-within is deliberately not used either,
+   for the same reason — a tapped card stays focused afterward. */
+@media (hover: hover) and (pointer: fine){
+  .thumb-flip:hover .thumb-flip-inner{
+    transform: rotateY(180deg);
+  }
+}
+.thumb-flip.is-flipped .thumb-flip-inner{
+  transform: rotateY(180deg);
+}
+.thumb-face{
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 12px);
-  transform: translateX(-50%) translateY(6px);
-  width: 300px;
-  max-width: 82vw;
+  inset: 0;
+  border-radius: 4px;
+  border: 6px solid #fff;
+  box-shadow: var(--shadow-photo);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.thumb-front{
+  background-color: var(--grey-block);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.thumb-back{
   background: var(--navy);
   color: var(--cream);
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 20px 22px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237,237,237,0.35) transparent;
+}
+.thumb-back::-webkit-scrollbar{
+  width: 8px;
+}
+.thumb-back::-webkit-scrollbar-track{
+  background: transparent;
+}
+.thumb-back::-webkit-scrollbar-thumb{
+  background-color: rgba(237,237,237,0.35);
+  border-radius: 10px;
+  border: 2px solid var(--navy);
+}
+.thumb-back::-webkit-scrollbar-thumb:hover{
+  background-color: rgba(237,237,237,0.55);
+}
+.thumb-back p{
   font-family: var(--sans);
   font-size: 0.92rem;
   line-height: 1.55;
   text-align: left;
   text-wrap: pretty;
-  padding: 18px 20px;
-  border-radius: 8px;
-  box-shadow: 0 16px 34px rgba(0,0,0,0.3);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-  z-index: 40;
+  margin: 0;
 }
-.thumb-tip::after{
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-top-color: var(--navy);
-}
-.project-col .thumb:hover .thumb-tip,
-.project-col .thumb:focus-within .thumb-tip{
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-  pointer-events: auto;
-}
-
 blockquote.pull-quote{
   max-width: 860px;
   margin: 0 auto 120px;
@@ -457,7 +480,6 @@ blockquote.pull-quote cite{
   max-width: 900px;
   margin: 0 auto;
   border-radius: 10px;
-  box-shadow: var(--shadow-soft);
 }
 .tier{
   position: sticky;
@@ -467,14 +489,30 @@ blockquote.pull-quote cite{
   column-gap: 32px;
   padding: 0 32px 30px;
   transition: filter 0.2s ease;
+  box-shadow: var(--shadow-soft);
 }
 .tier:first-child{ border-top-left-radius: 10px; border-top-right-radius: 10px; }
-.tier:last-child{ border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+.tier.tier-step-4{ border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
 
-.tier:nth-child(1){ background: var(--tier-1); top: calc(var(--header-h, 96px) + 76px); z-index: 1; }
-.tier:nth-child(2){ background: var(--tier-2); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h)); z-index: 2; }
-.tier:nth-child(3){ background: var(--tier-3); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 2); z-index: 3; }
-.tier:nth-child(4){ background: var(--tier-4); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 3); z-index: 4; }
+/* Real (non-padding) trailing height inside .tier-list so the last tier's
+   sticky containing block actually extends past its own box — see
+   setupGivingStack in script.js for why this can't be padding instead.
+   Invisible: no background of its own, and it sits behind the last
+   tier's higher z-index the entire time it would otherwise be visible. */
+.tier-dwell-spacer{ pointer-events: none; }
+
+/* All four tiers are direct children of .tier-list and share it as their
+   sticky containing block — the classic "stacking cards" setup: each
+   earlier, lower-z-index tier stays stuck underneath the ones stacking on
+   top of it for as long as .tier-list has height left below it, which is
+   what makes them genuinely overlap rather than leave a gap. These are
+   addressed by an explicit class set by JS (rather than :nth-child)
+   because setupGivingStack also gives .tier-list some extra trailing
+   height for the last tier's own dwell time, and JS is what computes it. */
+.tier.tier-step-1{ background: var(--tier-1); top: calc(var(--header-h, 96px) + 76px); z-index: 1; }
+.tier.tier-step-2{ background: var(--tier-2); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h)); z-index: 2; }
+.tier.tier-step-3{ background: var(--tier-3); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 2); z-index: 3; }
+.tier.tier-step-4{ background: var(--tier-4); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 3); z-index: 4; }
 
 .tier:hover{ filter: brightness(1.03); }
 
@@ -679,6 +717,84 @@ blockquote.pull-quote cite{
 .holding-text h3 em{ font-style: italic; }
 .holding-text p{ margin: 0; color: var(--navy-soft); font-size: 0.92rem; }
 
+/* notable holdings — mobile: the scattered collage above reads as a jumble
+   at phone width, so below 700px it's replaced by this plain vertical
+   stack of full-width photo + caption pairs, each one tappable to view
+   the photo larger (see script.js "notable holdings mobile lightbox").
+   Hidden by default; the 700px breakpoint below is what shows it (and
+   hides .holdings-list in its place). */
+.holdings-mobile{ display: none; }
+.holdings-mobile-item{
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.holdings-mobile-item .hm-photo{
+  display: block;
+  width: 100%;
+  height: 240px;
+  border-radius: 10px;
+  background: var(--grey-block);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: var(--shadow-photo);
+  margin-bottom: 14px;
+  position: relative;
+}
+.holdings-mobile-item .hm-tap{
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(13,46,76,0.72);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.holdings-mobile-item h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.08rem;
+  margin: 0 0 6px;
+  color: var(--navy);
+}
+.holdings-mobile-item h3 em{ font-style: italic; }
+.holdings-mobile-item p{ margin: 0; color: var(--navy-soft); font-size: 0.92rem; }
+
+/* tap-to-view lightbox (Notable Holdings mobile only) — reuses the same
+   .modal-overlay fade/backdrop and .modal-close button as the contact
+   modal, with its own box since it just frames an image. */
+.lightbox-box{
+  position: relative;
+  max-width: 92vw;
+  max-height: 86vh;
+}
+.lightbox-box img{
+  display: block;
+  max-width: 92vw;
+  max-height: 86vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+.lightbox-box .modal-close{
+  top: -38px;
+  right: 0;
+  color: #fff;
+  font-size: 1.7rem;
+}
+
 /* by the numbers */
 /* by the numbers — the title pins under the header (echoing the Giving
    Opportunities title above) while, beneath it, the stat cards start
@@ -858,6 +974,13 @@ blockquote.pull-quote cite{
 /* ---------- responsive ---------- */
 @media (max-width: 900px){
   .about-intro .about-grid{ grid-template-columns: 1fr; }
+  /* min-height:100% (used for the two-column layout, where the grid row
+     is stretched to match the text column's height) resolves to nothing
+     once the grid drops to a single column — the row's height is then
+     just the photo's own content height, which is zero for a background-
+     image div, so the photo silently disappeared. Give it a real height
+     instead so it shows at the top of the page as its own row. */
+  .about-intro .thumb{ min-height: 0; height: 260px; margin-bottom: 8px; }
   .project-cols{ grid-template-columns: 1fr 1fr; }
   /* below ~900px the pin/horizontal-scroll effect is dropped in favor of a
      simple static stacked column — JS (recalcTimeline) also detects this
@@ -903,7 +1026,14 @@ blockquote.pull-quote cite{
     transition: transform 0.25s ease;
   }
   .main-nav.open{ transform: translateY(0); }
+  .main-nav .btn-solid{ align-self: center; }
   .nav-toggle{ display: block; }
+  /* "Fundraising Vision," "Giving Opportunities," "Notable Holdings,"
+     "By the Numbers," and "The Community Memory Lab" all share this
+     class — sizing it down here covers every one of them at once. */
+  .section-title{ font-size: 1.05rem; letter-spacing: 0.09em; }
+  blockquote.pull-quote{ font-size: 1.2rem; }
+  .about-intro h1{ font-size: 1.15rem; }
   .project-cols{ grid-template-columns: 1fr; max-width: 320px; }
   .container{ padding: 0 24px; }
   .tier{
@@ -914,12 +1044,11 @@ blockquote.pull-quote cite{
   .tier .tier-price{ min-width: 0; font-size: 1rem; }
   .tier .tier-name{ font-size: 1.08rem; }
   .tier .tier-icon{ width: 40px; height: 40px; }
-  .holdings-list{ grid-template-columns: 130px 1fr; gap: 10px 18px; }
-  .holdings-photos{ height: 560px; }
-  .hphoto:nth-child(1){ left: 10px; width: 78px;  height: 78px; }
-  .hphoto:nth-child(2){ left: 30px; width: 104px; height: 104px; }
-  .hphoto:nth-child(3){ left: 3px;  width: 70px;  height: 70px; }
-  .hphoto:nth-child(4){ left: 28px; width: 112px; height: 112px; }
-  .hphoto:nth-child(5){ left: 9px;  width: 83px;  height: 83px; }
-  .hphoto:nth-child(6){ left: 27px; width: 99px;  height: 99px; }
+  .holdings-list{ display: none; }
+  .holdings-mobile{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 26px;
+  }
 }

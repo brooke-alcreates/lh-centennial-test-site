@@ -2,6 +2,28 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+  /* ---------- fundraising vision — flip cards ----------
+     :hover (see styles.css) already flips a card for mouse users. A tap
+     or keyboard Enter/Space toggles the same "is-flipped" class here
+     instead of relying on :focus-within — a tapped card stays focused
+     afterward, so :focus-within would never let a second tap flip it
+     back. */
+  document.querySelectorAll('.thumb-flip').forEach(function (card) {
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-pressed', 'false');
+    function toggleFlip() {
+      var flipped = card.classList.toggle('is-flipped');
+      card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+    }
+    card.addEventListener('click', toggleFlip);
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        toggleFlip();
+      }
+    });
+  });
+
   /* ---------- header height (drives full-height hero) ---------- */
   var siteHeader = document.querySelector('.site-header');
   function setHeaderHeight() {
@@ -14,25 +36,35 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- Giving Opportunities sticky stack ----------
      Computes exact pixel offsets (rather than trusting guessed CSS
      constants) so the effect holds up under any header height, title
-     height, tier-head height, font size, or viewport height:
-     - each tier sticks directly under the sticky title + the tiers
-       stacked above it, so every earlier tier fully collapses to just
-       its price/title row before the next one covers it
-     - the tier list gets only the *shortfall* of trailing scroll room
-       the last tier actually needs to reach its own stacked position
-       (often zero), instead of a fixed guess that left dead space. */
+     height, tier-head height, font size, or viewport height. All four
+     tiers are direct children of .tier-list and share it as one sticky
+     containing block — the classic "stacking cards" setup, where each
+     earlier tier stays stuck UNDER the ones stacking on top of it (an
+     actual overlap, collapsing to just its price/title row) for as long
+     as .tier-list still has height left below it. Splitting each tier
+     into its own isolated wrapper was tried at one point to stop the
+     last tier from ever covering the others, but an isolated wrapper's
+     sticky range can only ever run out exactly where that tier's own
+     box ends — so the next tier always arrived a beat late, after a
+     visible blank gap, no matter how much buffer the wrapper was given.
+     A shared container avoids that (the next tier's arrival naturally
+     overlaps the previous one's stuck range), at the cost of needing a
+     bit of care at the very end of the list, handled below. */
   function setupGivingStack() {
     var tierList = document.querySelector('.tier-list');
-    var tiers = document.querySelectorAll('.tier');
+    var tiers = Array.prototype.slice.call(document.querySelectorAll('.tier'));
     var titleWrap = document.querySelector('.giving-sticky-title');
     if (!tierList || !tiers.length) return;
 
+    tiers.forEach(function (tier, i) {
+      tier.classList.add('tier-step-' + (i + 1));
+    });
+
+    // Reset earlier-applied sizing first so this stays idempotent (resize
+    // re-runs it from scratch rather than compounding).
+    tiers.forEach(function (tier) { tier.style.minHeight = ''; });
+
     var lastTier = tiers[tiers.length - 1];
-    var baseBottomPad = 30; // matches the --tier padding: 0 32px 30px rule
-
-    // Reset first so this is idempotent across repeated calls (resize).
-    lastTier.style.paddingBottom = baseBottomPad + 'px';
-
     var headerH = siteHeader ? siteHeader.offsetHeight : 0;
     var titleH = titleWrap ? titleWrap.offsetHeight : 0;
     var firstHead = tiers[0].querySelector('.tier-head');
@@ -49,27 +81,64 @@ document.addEventListener('DOMContentLoaded', function () {
       tier.style.zIndex = i + 1;
     });
 
-    // Natural (un-stuck) document position of the last tier = the tier
-    // list's own top plus the rendered height of every tier before it.
-    // (offsetHeight of a sticky element still reflects its normal-flow
-    // box height, so this is safe to read regardless of scroll position.)
-    var listTop = tierList.getBoundingClientRect().top + window.scrollY;
-    var naturalTopLast = listTop;
-    for (var i = 0; i < tiers.length - 1; i++) {
-      naturalTopLast += tiers[i].offsetHeight;
+    // A shared sticky container makes an EARLIER (lower z-index) tier stay
+    // stuck as long as there's still container height left below it — and
+    // since a shared container's remaining height keeps shrinking as later
+    // tiers use it up, a tier further down the list always runs out of
+    // that shared runway, and so releases, sooner than the ones above it.
+    // Once released it just continues scrolling normally, at the same
+    // rate as the page, same as it would with no sticky behavior at all —
+    // and because the LAST tier ("The Heritage Friend") has the highest
+    // z-index, if it's still releasing/scrolling normally while an
+    // earlier tier is still stuck, it visually climbs up and over that
+    // tier's still-visible collapsed row instead of stopping to sit
+    // cleanly beneath it. The gap between when an earlier tier releases
+    // and when a later one does is exactly headH per step *plus* however
+    // much taller the later tier's own box is than the earlier one's —
+    // so as long as every tier's box is at least about as tall as every
+    // tier that comes after it, that gap can only ever be crossed by
+    // less than one step's worth of scrolling, which isn't enough for a
+    // later tier to climb far enough to reach an earlier one before that
+    // earlier one has ALSO already released. Padding each tier's box up
+    // to (at least) the height of the next one plus a small margin
+    // guarantees that, without needing to touch any tier's real content.
+    var HEIGHT_MARGIN = 18;
+    var floor = tiers[tiers.length - 1].offsetHeight;
+    for (var i = tiers.length - 2; i >= 0; i--) {
+      var need = floor + HEIGHT_MARGIN;
+      if (tiers[i].offsetHeight < need) {
+        tiers[i].style.minHeight = need + 'px';
+        floor = need;
+      } else {
+        floor = tiers[i].offsetHeight;
+      }
     }
-    var lastTopOffset = baseTop + (tiers.length - 1) * headH;
-    var requiredScroll = naturalTopLast - lastTopOffset;
-    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    var shortfall = requiredScroll - maxScroll;
 
-    // Any shortfall becomes extra bottom padding on the LAST card itself
-    // (which already has a solid background) rather than blank space on
-    // the container below it — so if any runway is still needed, it reads
-    // as generous card padding, not a stray gap before the CTA button.
-    if (shortfall > 0) {
-      lastTier.style.paddingBottom = Math.ceil(baseBottomPad + shortfall + 2) + 'px';
+    // With a shared container, .tier-list's natural height (just the sum
+    // of the tiers' own heights) ends exactly where the LAST tier's own
+    // box ends — there's nothing after it to lend it any extra runway,
+    // so it would never get to sit stuck for even an instant before
+    // continuing to scroll away with the page. A little extra height
+    // added to .tier-list itself buys it real, visible dwell time.
+    // Crucially, this buffer has to be real CONTENT inside .tier-list,
+    // not padding-bottom on .tier-list itself — a sticky element's range
+    // is bounded by its containing block's *content* edge, which sits
+    // inside the parent's own padding, so padding added to the parent
+    // doesn't move that edge at all (confirmed by testing: the last tier
+    // kept zero slack with padding-bottom alone). A plain spacer div
+    // sized via height, appended after the last tier, is real content
+    // and does move it. It also can't live on the last tier's own box:
+    // making that tier's own box taller needs LESS additional scroll for
+    // its own bottom edge to reach the container's bottom — the opposite
+    // of what's wanted here.
+    var spacer = tierList.querySelector('.tier-dwell-spacer');
+    if (!spacer) {
+      spacer = document.createElement('div');
+      spacer.className = 'tier-dwell-spacer';
+      spacer.setAttribute('aria-hidden', 'true');
+      tierList.appendChild(spacer);
     }
+    spacer.style.height = Math.round(headH * 1.4) + 'px';
   }
 
   setupGivingStack();
@@ -277,6 +346,40 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeModal();
   });
+
+  /* ---------- notable holdings — mobile tap-to-view lightbox ---------- */
+  var holdingsLightbox = document.getElementById('holdingsLightbox');
+  var lightboxImg = document.getElementById('lightboxImg');
+  var lightboxClose = document.getElementById('closeLightbox');
+  var holdingsMobileItems = document.querySelectorAll('.holdings-mobile-item');
+
+  function openLightbox(src, alt) {
+    if (!holdingsLightbox || !lightboxImg || !src) return;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    holdingsLightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    if (!holdingsLightbox) return;
+    holdingsLightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  holdingsMobileItems.forEach(function (item) {
+    item.addEventListener('click', function () {
+      openLightbox(item.getAttribute('data-lightbox-src'), item.getAttribute('data-lightbox-alt'));
+    });
+  });
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (holdingsLightbox) {
+    holdingsLightbox.addEventListener('click', function (e) {
+      if (e.target === holdingsLightbox) closeLightbox();
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
