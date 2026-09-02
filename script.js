@@ -458,9 +458,19 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    var firstCardTop = statCards[0].getBoundingClientRect().top;
+    // .stat-row no longer wraps to a second line on its own (see the
+    // flex-wrap: nowrap / flex-shrink rule in styles.css) — cards shrink
+    // to fit instead — so this is a last-resort safety net, not the
+    // primary defense. It has to tolerate ordinary rendering noise (real
+    // browsers can render flex/gap math a few px differently than this
+    // was tested in — subpixel font rounding, OS display scaling, etc.),
+    // so it only treats cards as wrapped if one sits nearly a full card
+    // height away from the first — that only happens on an actual second
+    // line, never from a few px of normal rendering variance.
+    var firstCardRect = statCards[0].getBoundingClientRect();
+    var wrapTolerance = Math.max(60, firstCardRect.height / 2);
     var wraps = Array.prototype.some.call(statCards, function (card) {
-      return Math.abs(card.getBoundingClientRect().top - firstCardTop) > 2;
+      return Math.abs(card.getBoundingClientRect().top - firstCardRect.top) > wrapTolerance;
     });
     if (wraps) {
       disableNumbersStack();

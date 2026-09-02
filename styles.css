@@ -838,12 +838,20 @@ blockquote.pull-quote cite{
   display: flex;
   justify-content: center;
   gap: 60px;
-  flex-wrap: wrap;
+  /* Stays on one line at every width the gather/reveal effect can run at
+     (see layoutNumbersStack in script.js, active from 900px up) — cards
+     shrink smoothly via flex-shrink instead of wrapping to a second line,
+     since the effect's math assumes a single row and a wrapped layout
+     broke it. Below 900px this rule doesn't matter: CSS drops the row to
+     a plain static stacked column (see the max-width:900px block). */
+  flex-wrap: nowrap;
 }
 .stat-card{
   background: var(--accent-blue);
   border-radius: 14px;
   width: 230px;
+  min-width: 0; /* let flex-shrink go below the number's own intrinsic width */
+  flex-shrink: 1;
   min-height: 190px;
   padding: 30px 24px;
   text-align: center;
