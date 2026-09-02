@@ -1,0 +1,925 @@
+/* ==========================================================================
+   Linn-Henley Centennial — shared stylesheet
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap');
+
+@font-face{
+  font-family: 'Aguzzo';
+  src: url('fonts/Aguzzo-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Aguzzo';
+  src: url('fonts/Aguzzo-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Aguzzo';
+  src: url('fonts/Aguzzo-RegularItalic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root{
+  --cream:        #EDEDED;
+  --cream-deep:   #EDEDED;
+  --navy:         #0D2E4C;
+  --navy-soft:    #0D2E4C;
+  --gold:         #A69B50;
+  --gold-deep:    #A69B50;
+  --gold-on-blue: #3E3A1E; /* same gold family, darkened — keeps tier prices and stat-card numbers
+    at a legible contrast against the new light-blue card backgrounds, where the flat
+    #A69B50 gold drops to roughly 1.2–1.9:1 (well under the 4.5:1 AA minimum) */
+  --gold-pale:    #A69B50;
+  --slate:        #1D446D;
+  --slate-deep:   #62748c;
+  --grey-block:   #d9d9d9;
+  --tier-1:       #BBD8F7;
+  --tier-2:       #A2CAF4;
+  --tier-3:       #89BBF1;
+  --tier-4:       #70ADEE;
+  --accent-blue:  #BBD8F7; /* flat card-accent blue: By the Numbers stat cards + Community Memory Lab icons */
+  --ink:          #0D2E4C;
+  --shadow-soft:  0 6px 18px rgba(13,46,76,0.12);
+  --shadow-photo: 0 10px 22px rgba(0,0,0,0.18);
+  --serif:        'Aguzzo', 'Baskerville', 'Baskerville Old Face', 'Libre Baskerville', 'Times New Roman', serif;
+  --serif-body:   'Aguzzo', 'Baskerville', 'Baskerville Old Face', 'Libre Baskerville', 'Georgia', serif;
+  --sans:         'Avenir', 'Avenir Next', 'Century Gothic', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --script:       'Alex Brush', cursive;
+  --max: 1180px;
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+  font-size: 20px; /* was the 16px browser default — bumps every rem-based size up */
+}
+
+body{
+  margin: 0;
+  background: var(--cream);
+  color: var(--navy);
+  font-family: var(--sans);
+  font-size: 22px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Any in-page anchor target clears the sticky header when scrolled to. */
+[id]{ scroll-margin-top: var(--header-h, 96px); }
+
+/* Headlines, labels, and quotes keep the serif display faces used
+   throughout the site; flowing copy (plain <p> tags, inheriting body's
+   sans-serif) gets a text-wrap that avoids single-word orphan lines.
+   text-wrap:balance evens out short headline/label blocks the same way. */
+h1, h2, h3,
+blockquote,
+.section-title,
+.eyebrow,
+.lede,
+.hero-copy,
+.cap,
+.amount-label{
+  text-wrap: balance;
+}
+p{
+  text-wrap: pretty;
+}
+
+img{ max-width: 100%; display: block; }
+
+a{ color: inherit; text-decoration: none; }
+
+.container{
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.eyebrow{
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  color: var(--navy);
+}
+
+.section-title{
+  font-family: var(--serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 1.5rem;
+  color: var(--navy);
+  text-align: center;
+  margin: 0 0 18px;
+}
+
+.lede{
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 46px;
+  color: var(--navy-soft);
+  font-size: 0.92rem;
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 14px 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--gold-deep);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+.btn-solid{
+  background: var(--gold-pale);
+  color: var(--navy);
+}
+.btn-solid:hover{
+  background: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+.btn-outline{
+  background: transparent;
+  color: var(--navy);
+  border-color: var(--gold);
+}
+.btn-outline:hover{
+  background: rgba(166,155,80,0.12);
+}
+
+/* ---------- header / nav ---------- */
+.site-header{
+  background: var(--cream);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid rgba(13,46,76,0.08);
+}
+.site-header .container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 22px;
+  padding-bottom: 18px;
+}
+.brand{
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.brand .brand-logo{
+  display: block;
+  height: 46px;
+  width: auto;
+}
+
+.main-nav{
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+.main-nav a.nav-link{
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.82rem;
+  color: var(--navy);
+  align-self: center;
+}
+.main-nav a.nav-link:not(.btn){
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  line-height: normal;
+}
+.main-nav a.nav-link:not(.btn):hover,
+.main-nav a.nav-link:not(.btn)[aria-current="page"]{
+  border-bottom-color: var(--navy);
+}
+
+.nav-toggle{
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+.nav-toggle span{
+  display: block;
+  width: 26px;
+  height: 2px;
+  background: var(--navy);
+  margin: 5px 0;
+}
+
+/* ---------- hero ---------- */
+.hero{
+  position: relative;
+  min-height: calc(100vh - var(--header-h, 96px));
+  background: linear-gradient(180deg, #dedede 0%, #d3d3d3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hero video,
+.hero .hero-fallback{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero .hero-fallback{
+  /* Real photo is set inline (background-image) once available; this
+     gradient is only the pre-photo/no-JS fallback fill. */
+  background-color: #d9d9d9;
+  background-image: repeating-linear-gradient(135deg, #d9d9d9 0px, #d9d9d9 40px, #dedede 40px, #dedede 80px);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Darkens toward the center, where the tagline sits, so the italic
+     white text stays legible over a busy, light-toned photo without
+     flattening the whole hero image into a uniform dark wash. */
+  background: radial-gradient(ellipse at center, rgba(18,22,28,0.58) 0%, rgba(18,22,28,0.38) 45%, rgba(18,22,28,0.22) 100%);
+}
+.hero-copy{
+  position: relative;
+  z-index: 2;
+  color: #fbfbfb;
+  font-family: var(--serif-body);
+  font-style: italic;
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+  text-align: center;
+  padding: 0 24px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.55), 0 6px 26px rgba(0,0,0,0.4);
+}
+
+/* Scroll cue — a small chevron pinned to the bottom of the hero, nudging
+   the visitor to keep scrolling. drop-shadow (rather than text-shadow)
+   follows the chevron's own SVG stroke shape, so it stays legible over
+   any part of the photo behind it. */
+.scroll-cue{
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 40px);
+  z-index: 2;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)) drop-shadow(0 6px 14px rgba(0,0,0,0.35));
+  animation: scrollCueBob 2.4s ease-in-out infinite;
+}
+.scroll-cue svg{ display: block; }
+@keyframes scrollCueBob{
+  0%, 100%{ transform: translate(-50%, 0); }
+  50%{ transform: translate(-50%, 10px); }
+}
+@media (prefers-reduced-motion: reduce){
+  .scroll-cue{ animation: none; }
+}
+
+/* ---------- fundraising vision ---------- */
+.vision{
+  padding: 80px 0 60px;
+}
+.goal-figure{
+  text-align: center;
+  margin: 30px 0 46px;
+}
+.goal-figure .amount{
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  color: var(--gold);
+  font-weight: 600;
+}
+.goal-figure .amount-label{
+  display: block;
+  font-family: var(--serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 1.15rem;
+  color: var(--gold-deep);
+  margin-top: 2px;
+}
+
+.project-cols{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+.project-col{ text-align: center; }
+.project-col .fig{
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  color: var(--gold);
+}
+.project-col .cap{
+  font-size: 0.92rem;
+  color: var(--navy-soft);
+  margin: 2px 0 14px;
+}
+.project-col .thumb{
+  background: var(--grey-block);
+  border-radius: 2px;
+  aspect-ratio: 4 / 3;
+  box-shadow: var(--shadow-photo);
+  position: relative; /* anchors .thumb-tip, where present */
+}
+.project-col .thumb.thumb-photo{
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.project-col .btn{
+  margin-top: 18px;
+  font-size: 0.7rem;
+  padding: 10px 22px;
+}
+
+/* Hover/focus detail card for a project thumb (currently just the
+   Community Memory Lab photo) — rises above the placeholder rather than
+   covering it, so the caption/figure above stay visible while reading it. */
+.thumb-tip{
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%) translateY(6px);
+  width: 300px;
+  max-width: 82vw;
+  background: var(--navy);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  text-align: left;
+  text-wrap: pretty;
+  padding: 18px 20px;
+  border-radius: 8px;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 40;
+}
+.thumb-tip::after{
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--navy);
+}
+.project-col .thumb:hover .thumb-tip,
+.project-col .thumb:focus-within .thumb-tip{
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+blockquote.pull-quote{
+  max-width: 860px;
+  margin: 0 auto 120px;
+  padding-top: 130px;
+  text-align: center;
+  font-family: var(--serif-body);
+  font-style: italic;
+  font-size: clamp(1.45rem, 2.3vw, 2.15rem);
+  line-height: 1.55;
+  color: var(--gold);
+}
+blockquote.pull-quote cite{
+  display: block;
+  margin-top: 24px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  color: var(--gold-deep);
+}
+
+/* ---------- giving opportunities ---------- */
+.giving{ padding: 20px 0 90px; }
+
+/* Section title pins under the site header while the tiers scroll beneath
+   it, echoing the "Revolutionary Mobile Waste Management Solution" title
+   on saapro.ae's "why saapro" section. */
+.giving-sticky-title{
+  position: sticky;
+  top: var(--header-h, 96px);
+  z-index: 50;
+  background: var(--cream);
+  padding: 18px 0 22px;
+}
+.giving-sticky-title .section-title{ margin: 0; }
+
+/* Sticky "stacking cards" list — each tier pins under the previous tier's
+   head row (and under the sticky title above) as you scroll, echoing the
+   saapro.ae "why saapro" cards: collapsed cards leave only their price +
+   title peeking above the active, fully-expanded card underneath.
+   Exact `top` offsets, z-index, and trailing scroll room are computed and
+   applied by script.js (setupGivingStack) so this keeps working whatever
+   the rendered header/title/head-row heights turn out to be; the values
+   below are just a same-ballpark fallback for the instant before JS runs. */
+:root{
+  --tier-head-h: 84px;
+}
+.tier-list{
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: var(--shadow-soft);
+}
+.tier{
+  position: sticky;
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 32px;
+  padding: 0 32px 30px;
+  transition: filter 0.2s ease;
+}
+.tier:first-child{ border-top-left-radius: 10px; border-top-right-radius: 10px; }
+.tier:last-child{ border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+
+.tier:nth-child(1){ background: var(--tier-1); top: calc(var(--header-h, 96px) + 76px); z-index: 1; }
+.tier:nth-child(2){ background: var(--tier-2); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h)); z-index: 2; }
+.tier:nth-child(3){ background: var(--tier-3); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 2); z-index: 3; }
+.tier:nth-child(4){ background: var(--tier-4); top: calc(var(--header-h, 96px) + 76px + var(--tier-head-h) * 3); z-index: 4; }
+
+.tier:hover{ filter: brightness(1.03); }
+
+.tier .tier-head{
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 26px;
+  height: var(--tier-head-h);
+}
+.tier .tier-price{
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--gold-on-blue);
+  white-space: nowrap;
+  min-width: 98px;
+}
+.tier .tier-name{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--navy);
+  margin: 0;
+}
+
+.tier .tier-icon{
+  grid-column: 1;
+  width: 58px;
+  height: 58px;
+  opacity: 0.85;
+}
+.tier .tier-icon svg{ width: 100%; height: 100%; }
+
+.tier .tier-detail{
+  grid-column: 2;
+  font-size: 0.92rem;
+  color: var(--navy);
+}
+.tier .tier-detail p{ margin: 0 0 14px; }
+.tier .tier-detail p:last-child{ margin-bottom: 0; }
+
+.giving-cta{ text-align: center; padding-top: 30px; }
+
+/* ---------- footer ---------- */
+.site-footer{
+  background: var(--slate);
+  height: 90px;
+}
+
+/* ---------- about page ---------- */
+.about-intro{
+  padding: 70px 0 0;
+}
+.about-intro .about-grid{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 46px;
+  align-items: stretch;
+}
+.about-intro .thumb{
+  background-color: var(--grey-block);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100%;
+  box-shadow: var(--shadow-photo);
+}
+.about-intro h1{
+  font-family: var(--serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 1.55rem;
+  margin: 0 0 16px;
+}
+.about-intro p{ margin: 0 0 14px; color: var(--navy); font-size: 0.92rem; }
+
+/* timeline — pins in place while the track slides horizontally as the
+   page scrolls, echoing the numbered-steps section on saapro.ae. Entries
+   alternate above/below a stationary dashed line (JS sets the exact
+   heights/padding so both sides hug the line regardless of how much
+   copy each entry has); the line itself doesn't travel with the track,
+   only the entries slide along it. */
+.timeline-wrap{
+  position: relative;
+  /* JS (recalcTimeline) sets the real height = pin height + however far
+     the track needs to travel; this is just a pre-JS fallback. */
+  height: 640px;
+}
+.timeline-pin{
+  position: sticky;
+  top: var(--header-h, 96px);
+  height: 460px; /* pre-JS fallback; recalcTimeline sets the real height */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.timeline-pin .container{ width: 100%; }
+.timeline{
+  position: relative;
+  overflow: hidden;
+}
+.timeline-line{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%; /* JS overrides with the exact px once content is measured */
+  border-top: 2px dashed var(--gold);
+}
+.timeline-track{
+  display: flex;
+  align-items: flex-start; /* prevents flex's default row-stretch from forcing every
+    item to the height of the tallest one BEFORE JS measures each item's true
+    content height — without this, layoutTimelineAlternate's maxAbove/maxBelow
+    measurement reads every item as pre-stretched to match the tallest sibling,
+    wildly overstating how much vertical room short entries actually need. */
+  gap: 110px;
+  will-change: transform;
+  position: relative;
+}
+.t-item{
+  position: relative;
+  flex: 0 0 300px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+/* below-the-line entries stack down from the line; above-the-line
+   entries bottom-align so they end right at the line. Exact height and
+   padding are set by JS (layoutTimelineAlternate) once content heights
+   are known. */
+.t-item.t-below{ justify-content: flex-start; }
+.t-item.t-above{ justify-content: flex-end; }
+.t-item .year{
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 6px;
+}
+.t-item h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.02rem;
+  margin: 0 0 6px;
+  color: var(--navy);
+}
+.t-item p{ margin: 0; font-size: 0.92rem; color: var(--navy-soft); }
+
+/* notable holdings — scattered, overlapping photo collage */
+.holdings{ padding: 20px 0 70px; }
+.holdings-list{
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 10px 60px;
+  max-width: 970px;
+  margin: 40px auto 0;
+}
+.holdings-photos{
+  grid-column: 1;
+  position: relative;
+  height: 840px;
+}
+.hphoto{
+  position: absolute;
+  background: var(--grey-block);
+  box-shadow: var(--shadow-photo);
+  border: 6px solid #fff;
+  transition: transform 0.3s ease, z-index 0.3s ease;
+}
+.hphoto.hphoto-photo{
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hphoto:hover{ transform: rotate(0deg) scale(1.06) !important; z-index: 20 !important; }
+
+/* left/width/height/rotation vary per photo for the scattered-collage look;
+   `top` is set by JS (layoutHoldingPhotos) to align each photo with the
+   vertical center of its matching caption in .holdings-copy. */
+.hphoto:nth-child(1){ left: 35px; width: 180px; height: 180px; transform: rotate(-8deg); z-index: 1; }
+.hphoto:nth-child(2){ left: 85px; width: 240px; height: 240px; transform: rotate(6deg);  z-index: 2; }
+.hphoto:nth-child(3){ left: 10px; width: 160px; height: 160px; transform: rotate(-10deg); z-index: 3; }
+.hphoto:nth-child(4){ left: 80px; width: 260px; height: 260px; transform: rotate(5deg);  z-index: 4; }
+.hphoto:nth-child(5){ left: 28px; width: 190px; height: 190px; transform: rotate(-6deg); z-index: 5; }
+.hphoto:nth-child(6){ left: 78px; width: 230px; height: 230px; transform: rotate(8deg);  z-index: 6; }
+
+.holdings-copy{
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+  padding: 6px 0;
+}
+.holding-text h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.08rem;
+  margin: 0 0 6px;
+  color: var(--navy);
+}
+.holding-text h3 em{ font-style: italic; }
+.holding-text p{ margin: 0; color: var(--navy-soft); font-size: 0.92rem; }
+
+/* by the numbers */
+/* by the numbers — the title pins under the header (echoing the Giving
+   Opportunities title above) while, beneath it, the stat cards start
+   gathered into a small offset/rotated 3D stack and fan out into their
+   row as the pinned section scrolls through its runway — each card
+   peeling off on its own staggered beat. All positioning math (the
+   pull-to-center offsets, the runway height, the title's stack-under
+   offset) is computed by script.js (layoutNumbersStack) so it holds up
+   under any font size, card count, or viewport. */
+/* No overflow:hidden here — an ancestor of a position:sticky element
+   with non-visible overflow changes its sticky containing block and
+   breaks the pinned title below. .numbers-pin already clips the
+   stacked cards, so nothing needs to be hidden at this level. */
+.numbers{ padding: 20px 0 70px; }
+
+.numbers-sticky-title{
+  position: sticky;
+  top: var(--header-h, 96px);
+  z-index: 30;
+  background: var(--cream);
+  padding: 18px 0 10px;
+}
+.numbers-sticky-title .section-title{ margin: 0; }
+
+.numbers-pin-wrap{
+  position: relative;
+  height: 1000px; /* pre-JS fallback; layoutNumbersStack sets the real runway */
+}
+.numbers-pin{
+  position: sticky;
+  top: calc(var(--header-h, 96px) + 70px); /* pre-JS fallback */
+  height: 420px; /* pre-JS fallback; layoutNumbersStack pads this for tilt */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.numbers-pin .container{ width: 100%; }
+
+.stat-row{
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.stat-card{
+  background: var(--accent-blue);
+  border-radius: 14px;
+  width: 230px;
+  min-height: 190px;
+  padding: 30px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  will-change: transform;
+  /* Smooths the steps between scroll-event updates — real trackpads/
+     wheels report scroll position in a handful of chunky jumps rather
+     than many small ones, so without this the cards would visibly
+     "snap" between stacked and revealed instead of gliding. */
+  transition: transform 0.2s cubic-bezier(.2,.8,.2,1);
+}
+.stat-card .num{
+  font-family: var(--serif);
+  font-size: 2.3rem;
+  color: var(--gold-on-blue);
+  display: block;
+}
+.stat-card p{ margin: 8px 0 0; font-size: 0.92rem; color: var(--navy); }
+
+/* community memory lab — each subsection gets an icon on the left with the
+   copy shifted right of it, matching the original screenshots. */
+.memory-lab{ padding: 10px 0 90px; }
+.memory-lab .inner{ max-width: 720px; margin: 0 auto; }
+.memory-lab-item{
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+  margin-top: 34px;
+}
+.memory-lab-item:first-of-type{ margin-top: 30px; }
+.ml-icon{
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ml-icon svg{ width: 24px; height: 24px; }
+.ml-copy{ flex: 1; min-width: 0; }
+.memory-lab h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+  color: var(--navy);
+}
+.memory-lab .ml-copy p{ margin: 0 0 4px; font-size: 0.92rem; }
+.memory-lab .cta-wrap{ text-align: center; margin-top: 30px; }
+
+/* ---------- contact modal ---------- */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(117,135,160,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.modal-overlay.open{
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-box{
+  background: var(--cream);
+  width: min(440px, 90vw);
+  border-radius: 6px;
+  padding: 40px 36px 34px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  transform: translateY(14px);
+  transition: transform 0.25s ease;
+}
+.modal-overlay.open .modal-box{ transform: translateY(0); }
+.modal-close{
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--navy);
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-box h2{
+  font-family: var(--serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--navy);
+}
+.modal-box .modal-lede{
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--navy-soft);
+  margin: 0 0 22px;
+}
+.modal-box form{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal-box input,
+.modal-box textarea{
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  background: var(--tier-3);
+  padding: 12px 14px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  color: var(--navy);
+}
+.modal-box input::placeholder,
+.modal-box textarea::placeholder{ color: rgba(13,46,76,0.55); }
+.modal-box textarea{ min-height: 110px; resize: vertical; }
+.modal-box .btn{ align-self: center; margin-top: 6px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px){
+  .about-intro .about-grid{ grid-template-columns: 1fr; }
+  .project-cols{ grid-template-columns: 1fr 1fr; }
+  /* below ~900px the pin/horizontal-scroll effect is dropped in favor of a
+     simple static stacked column — JS (recalcTimeline) also detects this
+     breakpoint and resets the track's transform/height to match. */
+  .timeline-wrap{ height: auto !important; }
+  .timeline-pin{ position: static; height: auto; overflow: visible; display: block; }
+  .timeline{ padding-top: 10px; overflow: visible; }
+  .timeline-track{ flex-direction: column; gap: 46px; transform: none !important; }
+  .t-item{ max-width: 100%; flex-basis: auto; height: auto !important; padding: 0 !important; }
+  .t-item.t-above{ justify-content: flex-start; }
+  .timeline-line{ display: none; }
+  .holdings-list{ grid-template-columns: 220px 1fr; gap: 10px 28px; }
+  .hphoto:nth-child(1){ left: 17px; width: 120px; height: 120px; }
+  .hphoto:nth-child(2){ left: 50px; width: 160px; height: 160px; }
+  .hphoto:nth-child(3){ left: 5px;  width: 108px; height: 108px; }
+  .hphoto:nth-child(4){ left: 47px; width: 172px; height: 172px; }
+  .hphoto:nth-child(5){ left: 15px; width: 128px; height: 128px; }
+  .hphoto:nth-child(6){ left: 45px; width: 152px; height: 152px; }
+  /* below ~900px the pin/stack-reveal effect is dropped in favor of a
+     plain static title + stacked cards — JS (layoutNumbersStack) also
+     detects this breakpoint and resets the cards' transform to match. */
+  .numbers-sticky-title{ position: static; padding: 0 0 10px; }
+  .numbers-pin-wrap{ height: auto !important; }
+  .numbers-pin{ position: static; height: auto; overflow: visible; display: block; }
+  .stat-card{ transform: none !important; }
+}
+
+@media (max-width: 700px){
+  .brand .brand-logo{
+    height: 32px;
+  }
+  .main-nav{
+    position: fixed;
+    top: 74px;
+    left: 0; right: 0;
+    background: var(--cream);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 40px 30px;
+    gap: 18px;
+    border-bottom: 1px solid rgba(13,46,76,0.08);
+    transform: translateY(-130%);
+    transition: transform 0.25s ease;
+  }
+  .main-nav.open{ transform: translateY(0); }
+  .nav-toggle{ display: block; }
+  .project-cols{ grid-template-columns: 1fr; max-width: 320px; }
+  .container{ padding: 0 24px; }
+  .tier{
+    grid-template-columns: 76px 1fr;
+    padding: 0 22px 22px;
+    column-gap: 18px;
+  }
+  .tier .tier-price{ min-width: 0; font-size: 1rem; }
+  .tier .tier-name{ font-size: 1.08rem; }
+  .tier .tier-icon{ width: 40px; height: 40px; }
+  .holdings-list{ grid-template-columns: 130px 1fr; gap: 10px 18px; }
+  .holdings-photos{ height: 560px; }
+  .hphoto:nth-child(1){ left: 10px; width: 78px;  height: 78px; }
+  .hphoto:nth-child(2){ left: 30px; width: 104px; height: 104px; }
+  .hphoto:nth-child(3){ left: 3px;  width: 70px;  height: 70px; }
+  .hphoto:nth-child(4){ left: 28px; width: 112px; height: 112px; }
+  .hphoto:nth-child(5){ left: 9px;  width: 83px;  height: 83px; }
+  .hphoto:nth-child(6){ left: 27px; width: 99px;  height: 99px; }
+}
