@@ -404,13 +404,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var numbersMaxScroll = 0;
   var numbersStackOffsets = null;
 
-  // Small alternating spread + rotation so the gathered cards read as an
-  // untidy little stack rather than a single flat rectangle; finalRotate
-  // is each card's resting tilt once fully revealed (unchanged from the
-  // original two-card design, extended to the same alternating pattern).
-  var stackJitterX = [-14, 10, -8, 14];
-  var stackJitterY = [-10, -4, 6, 12];
-  var stackJitterRotate = [-9, 6, -5, 8];
+  // Small alternating spread + rotation so the gathered cards read as a
+  // tight little stack rather than a single flat rectangle — just enough
+  // that each card's edge peeks out behind the one in front, not a fanned
+  // spread. finalRotate is each card's resting tilt once fully revealed
+  // (unchanged from the original two-card design, extended to the same
+  // alternating pattern).
+  var stackJitterX = [-5, 4, -3, 5];
+  var stackJitterY = [-4, -2, 2, 5];
+  var stackJitterRotate = [-3, 2, -2, 3];
   var finalRotate = [-2, 2, -2, 2];
 
   // Below 900px, CSS itself (see the max-width:900px block in styles.css)
