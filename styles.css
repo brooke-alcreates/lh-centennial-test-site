@@ -429,6 +429,32 @@ a{ color: inherit; text-decoration: none; }
   text-wrap: pretty;
   margin: 0;
 }
+/* Tap-to-flip affordance for the three Fundraising Vision photos. Shown
+   by default (touch devices, and as a safe fallback anywhere hover isn't
+   available); the (hover:hover) and (pointer:fine) block above hides it
+   for real mice, since hover already reveals the flip there. It lives
+   inside .thumb-front rather than .thumb-flip itself so it disappears
+   along with the front face — via that face's own backface-visibility —
+   once a visitor taps and the card turns around. */
+.thumb-tap{
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(13,46,76,0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.thumb-tap svg{ width: 16px; height: 16px; }
+/* This has to come after the .thumb-tap rule above (not just the earlier
+   .thumb-flip:hover block) — same specificity, so whichever display value
+   is declared LAST in the file wins the cascade for real-mouse visitors. */
+@media (hover: hover) and (pointer: fine){
+  .thumb-tap{ display: none; }
+}
 blockquote.pull-quote{
   max-width: 860px;
   margin: 0 auto 120px;
@@ -1014,7 +1040,19 @@ blockquote.pull-quote cite{
   .numbers-sticky-title{ position: static; padding: 0 0 10px; }
   .numbers-pin-wrap{ height: auto !important; }
   .numbers-pin{ position: static; height: auto; overflow: visible; display: block; }
-  .stat-card{ transform: none !important; }
+  /* The row itself still needs to actually become a column here — the
+     rules above only undo the sticky/pin positioning, they don't touch
+     .stat-row's own flex direction (it's a row with flex-wrap:nowrap for
+     the desktop shrink-to-fit behavior, see the base rule above). Without
+     this, cards were shrinking to fit side-by-side on mobile instead of
+     stacking, which isn't the intended static fallback layout. */
+  .stat-row{ flex-direction: column; align-items: center; gap: 20px; }
+  .stat-card{
+    transform: none !important;
+    width: 100%;
+    max-width: 320px;
+    flex-shrink: 0; /* flex-shrink acts on height in a column, not width — not wanted here */
+  }
 }
 
 @media (max-width: 700px){
