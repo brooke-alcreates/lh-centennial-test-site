@@ -413,6 +413,37 @@ document.addEventListener('DOMContentLoaded', function () {
   var stackJitterRotate = [-9, 6, -5, 8];
   var finalRotate = [-2, 2, -2, 2];
 
+  // Below 900px, CSS itself (see the max-width:900px block in styles.css)
+  // drops the pin/stack effect to a plain static title + stacked cards, so
+  // there's nothing here to undo beyond the transform/height reset. But
+  // .stat-row can ALSO wrap to two lines anywhere from 900px up to about
+  // 1180px — 4 cards at 230px plus three 60px gaps need ~1100px, and the
+  // container doesn't reliably offer that until its own max-width is
+  // reached — and the gather/reveal math below assumes a single row, so a
+  // wrapped row breaks it (the "revealed" cards end up in a broken
+  // two-line layout instead of the intended one-line stat-row). Rather
+  // than guess a second pixel breakpoint, this checks the row's ACTUAL
+  // rendered layout and falls back to the same static presentation CSS
+  // already uses below 900px whenever the cards don't all share one line.
+  function disableNumbersStack() {
+    numbersPinWrap.style.height = 'auto';
+    numbersPin.style.position = 'static';
+    numbersPin.style.height = 'auto';
+    numbersPin.style.overflow = 'visible';
+    numbersPin.style.display = 'block';
+    if (numbersTitle) numbersTitle.style.position = 'static';
+    numbersStackOffsets = null;
+    numbersMaxScroll = 0;
+  }
+
+  function enableNumbersStack() {
+    numbersPinWrap.style.height = '';
+    numbersPin.style.position = '';
+    numbersPin.style.overflow = '';
+    numbersPin.style.display = '';
+    if (numbersTitle) numbersTitle.style.position = '';
+  }
+
   function layoutNumbersStack() {
     if (!numbersPinWrap || !numbersPin || !statRow || !statCards.length) return;
 
@@ -420,10 +451,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // idempotent across repeated calls (resize).
     statCards.forEach(function (card) { card.style.transform = ''; });
     numbersPin.style.height = '';
+    enableNumbersStack();
 
     if (window.innerWidth < 900) {
-      numbersPinWrap.style.height = '';
-      numbersStackOffsets = null;
+      disableNumbersStack();
+      return;
+    }
+
+    var firstCardTop = statCards[0].getBoundingClientRect().top;
+    var wraps = Array.prototype.some.call(statCards, function (card) {
+      return Math.abs(card.getBoundingClientRect().top - firstCardTop) > 2;
+    });
+    if (wraps) {
+      disableNumbersStack();
       return;
     }
 

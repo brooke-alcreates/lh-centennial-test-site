@@ -748,6 +748,7 @@ blockquote.pull-quote cite{
   margin-bottom: 14px;
   position: relative;
 }
+.holdings-mobile-item.hm-crop-top .hm-photo{ background-position: top; }
 .holdings-mobile-item .hm-tap{
   position: absolute;
   right: 12px;
