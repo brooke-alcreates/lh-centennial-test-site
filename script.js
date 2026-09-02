@@ -526,8 +526,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // room AFTER that so the fully fanned-out cards sit still for a
     // while — instead of sliding out of view the instant the reveal
     // finishes — before the section finally releases.
-    var revealRunway = Math.max(500, pinH * 1.6);
-    var holdRunway = Math.max(600, pinH * 1.4);
+    //
+    // revealRunway is sized off the viewport, not the card stack: a
+    // single deliberate scroll (one "page down", a strong trackpad
+    // swipe/fling) commonly covers 60-100% of the viewport height in one
+    // go. The old pinH-based sizing (~pinH*1.6, a few hundred px) was
+    // well inside that range, so one normal scroll could blow straight
+    // through the whole reveal before anyone actually saw the cards
+    // gathered — from a user's seat that reads as "the cards are just a
+    // static row," not as a scroll effect that ran and finished. Sizing
+    // it to a healthy multiple of innerHeight instead means it always
+    // takes more than one such scroll to get through, so the gather-to-
+    // reveal transition can't be skipped over in a single motion.
+    var revealRunway = Math.max(pinH * 1.6, window.innerHeight * 1.4);
+    var holdRunway = Math.max(pinH * 1.4, window.innerHeight * 0.8);
     numbersMaxScroll = revealRunway;
     numbersPinWrap.style.height = (pinH + revealRunway + holdRunway) + 'px';
 
