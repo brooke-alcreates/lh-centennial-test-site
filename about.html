@@ -229,11 +229,14 @@
     <button class="modal-close" id="closeContact" aria-label="Close">&times;</button>
     <h2>Contact</h2>
     <p class="modal-lede">Have a question about giving, the campaign, or the collection? Send us a note.</p>
-    <form id="contactForm">
+    <form id="contactForm" action="https://formsubmit.co/catherine.oseas@cobpl.org" method="POST">
       <input type="text" name="name" placeholder="Name" required>
       <input type="email" name="email" placeholder="Email" required>
       <input type="text" name="subject" placeholder="Subject">
       <textarea name="message" placeholder="Message" required></textarea>
+      <!-- FormSubmit config fields: https://formsubmit.co/ -->
+      <input type="hidden" name="_subject" value="New message from the Linn-Henley Centennial site">
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
       <button type="submit" class="btn btn-solid">Send</button>
     </form>
   </div>

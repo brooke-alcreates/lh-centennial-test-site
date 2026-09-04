@@ -381,12 +381,40 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   if (contactForm) {
+    // Sends via FormSubmit (https://formsubmit.co) using its AJAX endpoint, so
+    // the visitor stays on the page and sees the same in-modal confirmation as
+    // before instead of being redirected to FormSubmit's own thank-you page.
+    // The form's own action/method attributes are a plain-HTML fallback for
+    // the rare visitor without JS — those still work on their own.
+    //
+    // One-time setup note: FormSubmit activates a destination address only
+    // after it receives its first submission, which triggers a confirmation
+    // email to that address with a link to click. Until that's clicked,
+    // submissions succeed here but don't arrive. No code change needed for
+    // that — it's a one-time step for whoever owns the inbox.
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      // Test site: no backend wired up yet — just acknowledge the submission.
-      var box = modal.querySelector('.modal-box');
-      box.innerHTML = '<h2>Thank you</h2><p class="modal-lede">Your note has been received. We will be in touch soon.</p>';
-      setTimeout(closeModal, 1600);
+      var submitBtn = contactForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      var ajaxUrl = 'https://formsubmit.co/ajax/' + contactForm.action.split('/').pop();
+      fetch(ajaxUrl, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(contactForm)
+      })
+        .then(function (res) { return res.ok ? res.json() : Promise.reject(res); })
+        .then(function () {
+          var box = modal.querySelector('.modal-box');
+          box.innerHTML = '<h2>Thank you</h2><p class="modal-lede">Your note has been received. We will be in touch soon.</p>';
+          setTimeout(closeModal, 1600);
+        })
+        .catch(function () {
+          var box = modal.querySelector('.modal-box');
+          box.innerHTML = '<h2>Something went wrong</h2>' +
+            '<p class="modal-lede">Your note could not be sent. Please email us directly at ' +
+            '<a href="mailto:catherine.oseas@cobpl.org">catherine.oseas@cobpl.org</a> instead.</p>';
+        });
     });
   }
 
